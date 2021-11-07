@@ -1,3 +1,5 @@
+import lombok.extern.log4j.Log4j;
+
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -7,7 +9,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-
+@Log4j
 public class Server {
   List<String> historyChat;
 
@@ -15,6 +17,7 @@ public class Server {
     this.historyChat = new ArrayList<>();
 
     ServerSocket miChat = new ServerSocket(Integer.parseInt(System.getenv().get("PORT")));
+   System.out.println(Integer.parseInt(System.getenv().get("PORT")));
     Socket cliente = null;
     boolean serverIsRunning = true;
 
