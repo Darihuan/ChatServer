@@ -1,4 +1,3 @@
-import lombok.extern.log4j.Log4j;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -9,7 +8,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-@Log4j
 public class Server {
   List<String> historyChat;
 
