@@ -3,6 +3,7 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -11,41 +12,43 @@ public class Server {
   List<String> historyChat;
 
   public void Server() throws IOException {
-    historyChat = new ArrayList<>();
-    ServerSocket miChat = new ServerSocket(8080);
+    this.historyChat = new ArrayList<>();
+
+    ServerSocket miChat = new ServerSocket(Integer.parseInt(System.getenv().get("PORT")));
     Socket cliente = null;
-    System.out.println(miChat.getInetAddress().getHostAddress());
+    boolean serverIsRunning = true;
 
+    while (serverIsRunning) {
       cliente = miChat.accept();
-      System.out.println("conectado");
-
+      System.out.println("conectado:" + miChat.getInetAddress().getHostAddress());
       DataInputStream inputStream = new DataInputStream(cliente.getInputStream());
       DataOutputStream outputStream = new DataOutputStream(cliente.getOutputStream());
       String linea = "";
       /*actualizar estado del chat al entrar a la aplicacion*/
+      outputStream.writeUTF(chatState());
+      System.out.println("Recibiendo mensaje...");
+      linea = inputStream.readUTF();
+     SimpleDateFormat format = new SimpleDateFormat("hh:mm");
+     Date fecha = new Date();
+      historyChat.add( linea+". "+format.format(fecha));
+      System.out.println(historyChat);
+      String state = "";
+  for (String mensaje : historyChat ) {
+      state += mensaje+";";
+  }
+      outputStream.writeUTF(state);
 
-      while (cliente.isConnected()) {
-        if (linea.equals("actualizar"))
-          historyChat.forEach(
-              mensaje -> {
-                try {
-                  outputStream.writeUTF(mensaje);
-                } catch (IOException e) {
-                  e.printStackTrace();
-                }
-              });
-        else if (!(linea = inputStream.readUTF()).equals("")) {
-
-          outputStream.writeUTF(
-              cliente.getInetAddress().getHostAddress() + ":" + new Date() + ": " + linea);
-          historyChat.add(
-              cliente.getInetAddress().getHostAddress() + ":" + new Date() + ": " + linea);
-        }
-
-      System.out.println("desconectado");
-      cliente.close();
-      inputStream.close();
-      outputStream.close();
+      System.out.println("enviado..");
     }
+  }
+
+  public String chatState() {
+    String state = "";
+    this.historyChat.forEach(
+        mensaje -> {
+          state.concat(mensaje + ";");
+        });
+    System.out.println(state);
+    return state;
   }
 }
